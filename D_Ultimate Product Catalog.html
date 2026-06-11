@@ -51,35 +51,49 @@ select{border:1px solid #ccc;border-radius:5px;padding:3px 6px;font-size:11px;ou
   text-transform:uppercase;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 </style></head><body>
 <div class="sticky-header">
-<div class="tb"><div><div class="s">PRODUCT CATALOG · All Branches</div><h1>D*ULTIMATE</h1></div>
-<div class="mt" id="mt">Loading…</div></div>
+<div class="tb">
+  <div><div class="sub" id="sub-date">PRODUCT CATALOG · Last updated: <span id="last-updated">9 Jun 2026</span></div><h1>D*ULTIMATE</h1></div>
+  <div class="mt" id="mt">Loading…</div>
+</div>
 <div class="rb" id="rb">
   <button class="rbb" onclick="document.getElementById('fi').click()">📂 Refresh Excel</button>
   <input type="file" id="fi" accept=".xlsx,.xls" onchange="loadXL(this.files[0])">
   <span id="rs">Drag new inventory Excel here to refresh stock · photos stay</span>
 </div>
 <div class="ctl">
+  <label>Search</label><input type="text" id="q" placeholder="Style ID…" oninput="R()">
+  <label>Sort</label>
+  <select id="so" onchange="R()">
+    <option value="coll">Collection</option><option value="pa">Price ↑</option>
+    <option value="pd">Price ↓</option><option value="ca">Carat ↑</option>
+    <option value="cd">Carat ↓</option><option value="sid">Style ID</option>
+    <option value="st">Most stock</option><option value="rapa">Carat (Rapaport)</option>
+  </select>
+  <label>Price ฿</label>
+  <input type="number" id="plo" placeholder="Min" oninput="R()" step="1000">–<input type="number" id="phi" placeholder="Max" oninput="R()" step="1000">
+  <label>Carat</label>
+  <input type="number" id="clo" placeholder="Min" oninput="R()" step="0.01" style="width:60px">–<input type="number" id="chi" placeholder="Max" oninput="R()" step="0.01" style="width:60px">
+  <button onclick="clearAll()" style="background:#2C3345;color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer">↺ Reset All</button>
+  <span id="active-filters" style="font-size:11px;color:#C00000;font-weight:600"></span>
+</div>
+<div class="ctl" id="cr"><label>Collection</label>
+  <button class="np on" data-c="" style="background:#6B7A8D">All</button>
+</div>
+<div class="ctl">
   <label>Type</label>
   <select id="type-sel" onchange="fT=this.value;updateActiveFilters();R()">
     <option value="">All Types</option>
-    <option value="DR">Ring</option>
-    <option value="DE">Earring</option>
-    <option value="DN">Necklace</option>
-    <option value="DB">Bracelet</option>
+    <option value="DR">Ring</option><option value="DE">Earring</option>
+    <option value="DN">Necklace</option><option value="DB">Bracelet</option>
     <option value="DG">Bangle</option>
   </select>
   <label style="margin-left:10px">Metal</label>
   <select id="metal-sel" onchange="fM=this.value;updateActiveFilters();R()">
     <option value="">All Metals</option>
-    <option value="WG">WG — White Gold</option>
-    <option value="PG">PG — Pink Gold</option>
-    <option value="YG">YG — Yellow Gold</option>
-    <option value="PT">PT — Platinum</option>
+    <option value="WG">WG — White Gold</option><option value="PG">PG — Pink Gold</option>
+    <option value="YG">YG — Yellow Gold</option><option value="PT">PT — Platinum</option>
   </select>
-</div>
-
-<div class="ctl">
-  <label>Branch</label>
+  <label style="margin-left:10px">Branch</label>
   <select id="branch-sel" onchange="fB=this.value;updateActiveFilters();R()">
     <option value="">All Branches</option>
     <option value="DCBY2">DCBY2</option>
@@ -153,6 +167,9 @@ function loadXL(file){document.getElementById('rs').textContent='Reading…';con
       if(NOTE){const n=String(r[NOTE]||'').trim().toLowerCase();if(n==='new'||n==='ใหม่')byS[sid].is_new=true;}});// sync dropdowns with current filter state
 const bsel=document.getElementById('branch-sel');
 if(bsel&&!byS[fB]){fB='';bsel.value='';}
-live.forEach(c=>{const d=byS[c.sid];if(d){c.qty=d.qty;c.sku=d.n;c.price=d.prices.length?Math.min(...d.prices):0;c.price_max=d.prices.length?Math.max(...d.prices):0;c.br=[...d.branches].sort().join(', ');c.is_new=d.is_new||false;}else{c.qty=0;c.sku=0;c.price=0;c.price_max=0;c.br='';c.is_new=false;}});rfbar.classList.add('ok');document.getElementById('rs').textContent=`✔ ${file.name} — ${Object.keys(byS).length} styles refreshed`;R();}catch(err){document.getElementById('rs').textContent='Error: '+err.message;}};reader.readAsBinaryString(file);}
+live.forEach(c=>{const d=byS[c.sid];if(d){c.qty=d.qty;c.sku=d.n;c.price=d.prices.length?Math.min(...d.prices):0;c.price_max=d.prices.length?Math.max(...d.prices):0;c.br=[...d.branches].sort().join(', ');c.is_new=d.is_new||false;}else{c.qty=0;c.sku=0;c.price=0;c.price_max=0;c.br='';c.is_new=false;}});rfbar.classList.add('ok');document.getElementById('rs').textContent=`✔ ${file.name} — ${Object.keys(byS).length} styles refreshed`;
+    const now=new Date();
+    const opts={day:'numeric',month:'short',year:'numeric'};
+    document.getElementById('last-updated').textContent=now.toLocaleDateString('en-GB',opts);R();}catch(err){document.getElementById('rs').textContent='Error: '+err.message;}};reader.readAsBinaryString(file);}
 R();
 </script></body></html>
